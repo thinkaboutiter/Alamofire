@@ -29,7 +29,7 @@ import XCTest
 final class RequestResponseTestCase: BaseTestCase {
     func testRequestResponse() {
         // Given
-        let urlString = "https://httpbin.org/get"
+        let urlString = "\(String.httpBinURLString)/get"
         let expectation = self.expectation(description: "GET request should succeed: \(urlString)")
         var response: DataResponse<Data?, AFError>?
 
@@ -40,7 +40,7 @@ final class RequestResponseTestCase: BaseTestCase {
                 expectation.fulfill()
             }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertNotNil(response?.request)
@@ -52,7 +52,7 @@ final class RequestResponseTestCase: BaseTestCase {
     func testRequestResponseWithProgress() {
         // Given
         let randomBytes = 1 * 25 * 1024
-        let urlString = "https://httpbin.org/bytes/\(randomBytes)"
+        let urlString = "\(String.httpBinURLString)/bytes/\(randomBytes)"
 
         let expectation = self.expectation(description: "Bytes download progress should be reported: \(urlString)")
 
@@ -69,7 +69,7 @@ final class RequestResponseTestCase: BaseTestCase {
                 expectation.fulfill()
             }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertNotNil(response?.request)
@@ -93,7 +93,7 @@ final class RequestResponseTestCase: BaseTestCase {
 
     func testPOSTRequestWithUnicodeParameters() {
         // Given
-        let urlString = "https://httpbin.org/post"
+        let urlString = "\(String.httpBinURLString)/post"
         let parameters = ["french": "français",
                           "japanese": "日本語",
                           "arabic": "العربية",
@@ -110,7 +110,7 @@ final class RequestResponseTestCase: BaseTestCase {
                 expectation.fulfill()
             }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertNotNil(response?.request)
@@ -130,7 +130,7 @@ final class RequestResponseTestCase: BaseTestCase {
     #if !SWIFT_PACKAGE
     func testPOSTRequestWithBase64EncodedImages() {
         // Given
-        let urlString = "https://httpbin.org/post"
+        let urlString = "\(String.httpBinURLString)/post"
 
         let pngBase64EncodedString: String = {
             let URL = url(forResource: "unicorn", withExtension: "png")
@@ -161,7 +161,7 @@ final class RequestResponseTestCase: BaseTestCase {
                 expectation.fulfill()
             }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertNotNil(response?.request)
@@ -189,12 +189,12 @@ final class RequestResponseTestCase: BaseTestCase {
         var response: DataResponse<Any, AFError>?
 
         // When
-        manager.request("https://httpbin.org/get").responseJSON { resp in
+        manager.request(URLRequest.makeHTTPBinRequest()).responseJSON { resp in
             response = resp
             expectation.fulfill()
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(response?.result.isSuccess, true)
@@ -209,12 +209,12 @@ final class RequestResponseTestCase: BaseTestCase {
         var response: DataResponse<Any, AFError>?
 
         // When
-        manager.request("https://httpbin.org/get").responseJSON { resp in
+        manager.request(URLRequest.makeHTTPBinRequest()).responseJSON { resp in
             response = resp
             expectation.fulfill()
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(response?.result.isSuccess, true)
@@ -232,7 +232,7 @@ final class RequestResponseTestCase: BaseTestCase {
 
         // When
         DispatchQueue.concurrentPerform(iterations: count) { _ in
-            session.request("https://httpbin.org/get").responseJSON { resp in
+            session.request(URLRequest.makeHTTPBinRequest()).responseJSON { resp in
                 responses.append(resp)
                 expectation.fulfill()
             }
@@ -254,13 +254,13 @@ final class RequestResponseTestCase: BaseTestCase {
         var receivedResponse: DataResponse<HTTPBinResponse, AFError>?
 
         // When
-        AF.request("https://httpbin.org/post", method: .post, parameters: parameters, encoder: JSONParameterEncoder.default)
+        AF.request("\(String.httpBinURLString)/post", method: .post, parameters: parameters, encoder: JSONParameterEncoder.default)
             .responseDecodable(of: HTTPBinResponse.self) { response in
                 receivedResponse = response
                 expect.fulfill()
             }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(receivedResponse?.result.success?.data, "{\"property\":\"one\"}")
@@ -273,13 +273,13 @@ final class RequestResponseTestCase: BaseTestCase {
         var receivedResponse: DataResponse<HTTPBinResponse, AFError>?
 
         // When
-        AF.request("https://httpbin.org/get", method: .get, parameters: parameters)
+        AF.request("\(String.httpBinURLString)/get", method: .get, parameters: parameters)
             .responseDecodable(of: HTTPBinResponse.self) { response in
                 receivedResponse = response
                 expect.fulfill()
             }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(receivedResponse?.result.success?.args, ["property": "one"])
@@ -292,13 +292,13 @@ final class RequestResponseTestCase: BaseTestCase {
         var receivedResponse: DataResponse<HTTPBinResponse, AFError>?
 
         // When
-        AF.request("https://httpbin.org/post", method: .post, parameters: parameters)
+        AF.request("\(String.httpBinURLString)/post", method: .post, parameters: parameters)
             .responseDecodable(of: HTTPBinResponse.self) { response in
                 receivedResponse = response
                 expect.fulfill()
             }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(receivedResponse?.result.success?.form, ["property": "one"])
@@ -326,7 +326,7 @@ final class RequestResponseTestCase: BaseTestCase {
         // When
         let request = session.request(URLRequest.makeHTTPBinRequest()).response { _ in expect.fulfill() }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(request.state, .finished)
@@ -355,7 +355,7 @@ final class RequestResponseTestCase: BaseTestCase {
             request.resume()
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(request.state, .finished)
@@ -384,7 +384,7 @@ final class RequestResponseTestCase: BaseTestCase {
             request.resume()
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(request.state, .finished)
@@ -413,7 +413,7 @@ final class RequestResponseTestCase: BaseTestCase {
             request.resume()
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(request.state, .finished)
@@ -439,7 +439,7 @@ final class RequestResponseTestCase: BaseTestCase {
             request.suspend()
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(request.state, .suspended)
@@ -467,7 +467,7 @@ final class RequestResponseTestCase: BaseTestCase {
             request.suspend()
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(request.state, .suspended)
@@ -496,7 +496,7 @@ final class RequestResponseTestCase: BaseTestCase {
             }
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(request.state, .cancelled)
@@ -527,7 +527,7 @@ final class RequestResponseTestCase: BaseTestCase {
             }
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(request.state, .cancelled)
@@ -560,7 +560,7 @@ final class RequestResponseTestCase: BaseTestCase {
             }
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(request.state, .cancelled)
@@ -610,7 +610,7 @@ final class RequestResponseTestCase: BaseTestCase {
             responseHandler.fulfill()
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(request.state, .finished)
@@ -657,7 +657,7 @@ final class RequestResponseTestCase: BaseTestCase {
 
         request.resume()
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(request.state, .cancelled)
@@ -688,7 +688,7 @@ final class RequestResponseTestCase: BaseTestCase {
 
         request.cancel()
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(response1?.error?.isExplicitlyCancelledError, true)
@@ -724,7 +724,7 @@ final class RequestResponseTestCase: BaseTestCase {
             }
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertNotNil(response1?.value)
@@ -744,15 +744,15 @@ final class RequestResponseTestCase: BaseTestCase {
         // When
         let expect1 = expectation(description: "response serializer 1 completion should be called")
         request.responseJSON { response1 = $0; expect1.fulfill() }
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         let expect2 = expectation(description: "response serializer 2 completion should be called")
         request.responseJSON { response2 = $0; expect2.fulfill() }
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         let expect3 = expectation(description: "response serializer 3 completion should be called")
         request.responseJSON { response3 = $0; expect3.fulfill() }
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertNotNil(response1?.value)
@@ -766,7 +766,7 @@ final class RequestResponseTestCase: BaseTestCase {
 class RequestDescriptionTestCase: BaseTestCase {
     func testRequestDescription() {
         // Given
-        let urlString = "https://httpbin.org/get"
+        let urlString = "\(String.httpBinURLString)/get"
         let manager = Session(startRequestsImmediately: false)
         let request = manager.request(urlString)
 
@@ -781,10 +781,10 @@ class RequestDescriptionTestCase: BaseTestCase {
             expectation.fulfill()
         }.resume()
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
-        XCTAssertEqual(request.description, "GET https://httpbin.org/get (\(response?.statusCode ?? -1))")
+        XCTAssertEqual(request.description, "GET \(String.httpBinURLString)/get (\(response?.statusCode ?? -1))")
     }
 }
 
@@ -843,7 +843,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
 
     func testGETRequestCURLDescription() {
         // Given
-        let urlString = "https://httpbin.org/get"
+        let urlString = "\(String.httpBinURLString)/get"
         let expectation = self.expectation(description: "request should complete")
         var components: [String]?
 
@@ -853,7 +853,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
             expectation.fulfill()
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(components?[0..<3], ["$", "curl", "-v"])
@@ -863,7 +863,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
 
     func testGETRequestCURLDescriptionSynchronous() {
         // Given
-        let urlString = "https://httpbin.org/get"
+        let urlString = "\(String.httpBinURLString)/get"
         let expectation = self.expectation(description: "request should complete")
         var components: [String]?
         var syncComponents: [String]?
@@ -876,7 +876,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
             expectation.fulfill()
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(components?[0..<3], ["$", "curl", "-v"])
@@ -887,7 +887,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
 
     func testGETRequestCURLDescriptionCanBeRequestedManyTimes() {
         // Given
-        let urlString = "https://httpbin.org/get"
+        let urlString = "\(String.httpBinURLString)/get"
         let expectation = self.expectation(description: "request should complete")
         var components: [String]?
         var secondComponents: [String]?
@@ -910,7 +910,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
             }
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(components?[0..<3], ["$", "curl", "-v"])
@@ -921,7 +921,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
 
     func testGETRequestWithCustomHeaderCURLDescription() {
         // Given
-        let urlString = "https://httpbin.org/get"
+        let urlString = "\(String.httpBinURLString)/get"
         let expectation = self.expectation(description: "request should complete")
         var cURLDescription: String?
 
@@ -932,7 +932,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
             expectation.fulfill()
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertNotNil(cURLDescription?.range(of: "-H \"X-Custom-Header: {\\\"key\\\": \\\"value\\\"}\""))
@@ -940,7 +940,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
 
     func testGETRequestWithDuplicateHeadersDebugDescription() {
         // Given
-        let urlString = "https://httpbin.org/get"
+        let urlString = "\(String.httpBinURLString)/get"
         let expectation = self.expectation(description: "request should complete")
         var cURLDescription: String?
         var components: [String]?
@@ -953,7 +953,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
             expectation.fulfill()
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(components?[0..<3], ["$", "curl", "-v"])
@@ -968,7 +968,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
 
     func testPOSTRequestCURLDescription() {
         // Given
-        let urlString = "https://httpbin.org/post"
+        let urlString = "\(String.httpBinURLString)/post"
         let expectation = self.expectation(description: "request should complete")
         var components: [String]?
 
@@ -978,7 +978,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
             expectation.fulfill()
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(components?[0..<3], ["$", "curl", "-v"])
@@ -988,7 +988,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
 
     func testPOSTRequestWithJSONParametersCURLDescription() {
         // Given
-        let urlString = "https://httpbin.org/post"
+        let urlString = "\(String.httpBinURLString)/post"
         let expectation = self.expectation(description: "request should complete")
         var cURLDescription: String?
         var components: [String]?
@@ -1004,7 +1004,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
             expectation.fulfill()
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(components?[0..<3], ["$", "curl", "-v"])
@@ -1021,14 +1021,12 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
 
     func testPOSTRequestWithCookieCURLDescription() {
         // Given
-        let urlString = "https://httpbin.org/post"
+        let urlString = "\(String.httpBinURLString)/post"
 
-        let properties = [HTTPCookiePropertyKey.domain: "httpbin.org",
-                          HTTPCookiePropertyKey.path: "/post",
-                          HTTPCookiePropertyKey.name: "foo",
-                          HTTPCookiePropertyKey.value: "bar"]
-
-        let cookie = HTTPCookie(properties: properties)!
+        let cookie = HTTPCookie(properties: [.domain: "\(String.httpBinDomain)",
+                                             .path: "/post",
+                                             .name: "foo",
+                                             .value: "bar"])!
         let cookieManager = managerWithCookie(cookie)
         let expectation = self.expectation(description: "request should complete")
         var components: [String]?
@@ -1039,7 +1037,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
             expectation.fulfill()
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(components?[0..<3], ["$", "curl", "-v"])
@@ -1050,9 +1048,9 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
 
     func testPOSTRequestWithCookiesDisabledCURLDescriptionHasNoCookies() {
         // Given
-        let urlString = "https://httpbin.org/post"
+        let urlString = "\(String.httpBinURLString)/post"
 
-        let properties = [HTTPCookiePropertyKey.domain: "httpbin.org",
+        let properties = [HTTPCookiePropertyKey.domain: "\(String.httpBinDomain)",
                           HTTPCookiePropertyKey.path: "/post",
                           HTTPCookiePropertyKey.name: "foo",
                           HTTPCookiePropertyKey.value: "bar"]
@@ -1068,7 +1066,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
             expectation.fulfill()
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         let cookieComponents = components?.filter { $0 == "-b" }
@@ -1077,7 +1075,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
 
     func testMultipartFormDataRequestWithDuplicateHeadersCURLDescriptionHasOneContentTypeHeader() {
         // Given
-        let urlString = "https://httpbin.org/post"
+        let urlString = "\(String.httpBinURLString)/post"
         let japaneseData = Data("日本語".utf8)
         let expectation = self.expectation(description: "multipart form data encoding should succeed")
         var cURLDescription: String?
@@ -1092,7 +1090,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
             expectation.fulfill()
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertEqual(components?[0..<3], ["$", "curl", "-v"])
@@ -1117,7 +1115,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
             expectation.fulfill()
         }
 
-        waitForExpectations(timeout: timeout, handler: nil)
+        waitForExpectations(timeout: timeout)
 
         // Then
         XCTAssertNotNil(cURLDescription, "debugDescription should not crash")
