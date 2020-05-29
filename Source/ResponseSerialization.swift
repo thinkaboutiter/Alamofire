@@ -983,13 +983,15 @@ extension DataStreamRequest {
                 let result = Result { try serializer.serialize(data) }
                     .mapError { $0.asAFError(or: .responseSerializationFailed(reason: .customSerializationFailed(error: $0))) }
                 // End work on serialization queue.
-                queue.async {
+                self.underlyingQueue.async {
                     self.eventMonitor?.request(self, didParseStream: result)
                     if result.isFailure, self.automaticallyCancelOnStreamError {
-                        queue.async { self.cancel() }
+                        self.cancel()
                     }
-                    self.capturingError {
-                        try stream(.init(event: .stream(result), token: .init(self)))
+                    queue.async {
+                        self.capturingError {
+                            try stream(.init(event: .stream(result), token: .init(self)))
+                        }
                     }
                 }
             }
@@ -1016,9 +1018,13 @@ extension DataStreamRequest {
                 // Start work on serialization queue.
                 let string = String(decoding: data, as: UTF8.self)
                 // End work on serialization queue.
-                queue.async {
-                    self.capturingError {
-                        try stream(.init(event: .stream(.success(string)), token: .init(self)))
+                self.underlyingQueue.async {
+                    self.eventMonitor?.request(self, didParseStream: .success(string))
+
+                    queue.async {
+                        self.capturingError {
+                            try stream(.init(event: .stream(.success(string)), token: .init(self)))
+                        }
                     }
                 }
             }

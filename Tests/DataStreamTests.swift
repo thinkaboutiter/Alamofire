@@ -373,7 +373,8 @@ final class DataStreamSerializationTests: BaseTestCase {
         var streamOnMain = false
         var completeOnMain = false
         var response: HTTPURLResponse?
-        let expect = expectation(description: "stream complete")
+        let didStream = expectation(description: "did stream")
+        let didComplete = expectation(description: "stream complete")
 
         // When
         AF.streamRequest(URLRequest.makeHTTPBinRequest(path: "stream/1"))
@@ -385,10 +386,11 @@ final class DataStreamSerializationTests: BaseTestCase {
                     case let .success(string):
                         responseString = string
                     }
+                    didStream.fulfill()
                 case let .complete(completion):
                     completeOnMain = Thread.isMainThread
                     response = completion.response
-                    expect.fulfill()
+                    didComplete.fulfill()
                 }
             }
 
