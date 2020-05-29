@@ -360,7 +360,8 @@ final class DataStreamTests: BaseTestCase {
         waitForExpectations(timeout: timeout)
 
         // Then
-        XCTAssertTrue(error?.isExplicitlyCancelledError == true)
+        XCTAssertTrue(error?.isExplicitlyCancelledError == true,
+            "error is not explicitly cancelled but \(error?.localizedDescription ?? "None")")
     }
 }
 
