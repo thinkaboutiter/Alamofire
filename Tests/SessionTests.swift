@@ -440,12 +440,12 @@ final class SessionTestCase: BaseTestCase {
 
         // When
         let request = session.request(urlRequest)
-            .cancel()
-            .resume()
             .response { resp in
                 response = resp
                 expectation.fulfill()
             }
+            .cancel()
+            .resume()
 
         waitForExpectations(timeout: timeout)
 
