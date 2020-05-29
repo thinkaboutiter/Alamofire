@@ -17,6 +17,8 @@ jobs:
       DEVELOPER_DIR: /Applications/Xcode_11.3.1.app/Contents/Developer
     steps:
       - uses: actions/checkout@v2
+      - name: Install Firewalk
+        run: brew tap jshier/firewalk && brew install firewalk && firewalk
       - name: macOS (5.1)
         run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -project "Alamofire.xcodeproj" -scheme "Alamofire macOS" -destination "platform=macOS" clean test | xcpretty
   macOS_5_2:
@@ -26,6 +28,8 @@ jobs:
       DEVELOPER_DIR: /Applications/Xcode_11.5.app/Contents/Developer
     steps:
       - uses: actions/checkout@v2
+      - name: Install Firewalk
+        run: brew tap jshier/firewalk && brew install firewalk && firewalk
       - name: macOS (5.2)
         run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -project "Alamofire.xcodeproj" -scheme "Alamofire macOS" -destination "platform=macOS" clean test | xcpretty
   Catalyst:
@@ -35,6 +39,8 @@ jobs:
       DEVELOPER_DIR: /Applications/Xcode_11.5.app/Contents/Developer
     steps:
       - uses: actions/checkout@v2
+      - name: Install Firewalk
+        run: brew tap jshier/firewalk && brew install firewalk && firewalk
       - name: Catalyst
         run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -project "Alamofire.xcodeproj" -scheme "Alamofire iOS" -destination "platform=macOS" clean test | xcpretty
   iOS:
@@ -47,6 +53,8 @@ jobs:
         destination: ["OS=13.5,name=iPhone 11 Pro"] #, "OS=12.4,name=iPhone XS", "OS=11.4,name=iPhone X", "OS=10.3.1,name=iPhone SE"]
     steps:
       - uses: actions/checkout@v2
+      - name: Install Firewalk
+        run: brew tap jshier/firewalk && brew install firewalk && firewalk
       - name: iOS - ${{ matrix.destination }}
         run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -project "Alamofire.xcodeproj" -scheme "Alamofire iOS" -destination "${{ matrix.destination }}" clean test | xcpretty
   tvOS:
@@ -59,6 +67,8 @@ jobs:
         destination: ["OS=13.4,name=Apple TV 4K"] #, "OS=11.4,name=Apple TV 4K", "OS=10.2,name=Apple TV 1080p"]
     steps:
       - uses: actions/checkout@v2
+      - name: Install Firewalk
+        run: brew tap jshier/firewalk && brew install firewalk && firewalk
       - name: tvOS - ${{ matrix.destination }}
         run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -project "Alamofire.xcodeproj" -scheme "Alamofire tvOS" -destination "${{ matrix.destination }}" clean test | xcpretty
   watchOS:
@@ -80,5 +90,7 @@ jobs:
       DEVELOPER_DIR: /Applications/Xcode_11.5.app/Contents/Developer
     steps:
       - uses: actions/checkout@v2
+      - name: Install Firewalk
+        run: brew tap jshier/firewalk && brew install firewalk && firewalk
       - name: SPM Test
         run: swift test -c debug
