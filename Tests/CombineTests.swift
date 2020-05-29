@@ -370,7 +370,8 @@ final class DataRequestCombineTests: CombineTestCase {
 
         // Then
         XCTAssertTrue(response?.result.isFailure == true)
-        XCTAssertTrue(response?.error?.isExplicitlyCancelledError == true)
+        XCTAssertTrue(response?.error?.isExplicitlyCancelledError == true
+            "error is not explicitly cancelled but \(error?.localizedDescription ?? "None")")
         XCTAssertTrue(request.isCancelled)
         XCTAssertNil(token)
     }
@@ -396,7 +397,8 @@ final class DataRequestCombineTests: CombineTestCase {
 
         // Then
         XCTAssertTrue(response?.result.isFailure == true)
-        XCTAssertTrue(response?.error?.isExplicitlyCancelledError == true)
+        XCTAssertTrue(response?.error?.isExplicitlyCancelledError == true
+            "error is not explicitly cancelled but \(error?.localizedDescription ?? "None")")
         XCTAssertTrue(request.isCancelled)
     }
 
@@ -878,7 +880,8 @@ final class DataStreamRequestCombineTests: CombineTestCase {
 
         // Then
         XCTAssertNotNil(error)
-        XCTAssertTrue(error?.isExplicitlyCancelledError == true)
+        XCTAssertTrue(error?.isExplicitlyCancelledError == true
+            "error is not explicitly cancelled but \(error?.localizedDescription ?? "None")")
         XCTAssertTrue(request.isCancelled)
         XCTAssertNil(token)
     }
@@ -904,7 +907,8 @@ final class DataStreamRequestCombineTests: CombineTestCase {
 
         // Then
         XCTAssertNotNil(error)
-        XCTAssertTrue(error?.isExplicitlyCancelledError == true)
+        XCTAssertTrue(error?.isExplicitlyCancelledError == true
+            "error is not explicitly cancelled but \(error?.localizedDescription ?? "None")")
         XCTAssertTrue(request.isCancelled)
     }
 
@@ -1288,7 +1292,8 @@ final class DownloadRequestCombineTests: CombineTestCase {
 
         // Then
         XCTAssertTrue(response?.result.isFailure == true)
-        XCTAssertTrue(response?.error?.isExplicitlyCancelledError == true)
+        XCTAssertTrue(response?.error?.isExplicitlyCancelledError == true
+            "error is not explicitly cancelled but \(error?.localizedDescription ?? "None")")
         XCTAssertTrue(request.isCancelled)
         XCTAssertNil(token)
     }
@@ -1314,7 +1319,8 @@ final class DownloadRequestCombineTests: CombineTestCase {
 
         // Then
         XCTAssertTrue(response?.result.isFailure == true)
-        XCTAssertTrue(response?.error?.isExplicitlyCancelledError == true)
+        XCTAssertTrue(response?.error?.isExplicitlyCancelledError == true
+            "error is not explicitly cancelled but \(error?.localizedDescription ?? "None")")
         XCTAssertTrue(request.isCancelled)
     }
 
