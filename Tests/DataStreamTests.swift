@@ -342,7 +342,7 @@ final class DataStreamTests: BaseTestCase {
 
     func testThatDataStreamCanBeCancelledByToken() {
         // Given
-        let expectedSize = 1000
+        let expectedSize = 10_000
         var error: AFError?
         let expect = expectation(description: "stream should complete")
 
