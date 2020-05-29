@@ -109,6 +109,36 @@ class BasicAuthenticationTestCase: AuthenticationTestCase {
         XCTAssertNil(response?.error)
     }
 
+    func testHTTPBasicAuthenticationWithStoredCredentials() {
+        // Given
+        let expectation = self.expectation(description: "\(urlString) 200")
+
+        var response: DataResponse<Data?, AFError>?
+
+        // When
+        let credential = URLCredential(user: user, password: password, persistence: .forSession)
+        URLCredentialStorage.shared.setDefaultCredential(credential,
+                                                         for: .init(host: .httpBinDomain,
+                                                                    port: .port,
+                                                                    protocol: .scheme,
+                                                                    realm: .httpBinDomain,
+                                                                    authenticationMethod: NSURLAuthenticationMethodHTTPBasic))
+        manager.request(urlString)
+            .response { resp in
+                response = resp
+                expectation.fulfill()
+            }
+
+        waitForExpectations(timeout: timeout)
+
+        // Then
+        XCTAssertNotNil(response?.request)
+        XCTAssertNotNil(response?.response)
+        XCTAssertEqual(response?.response?.statusCode, 200)
+        XCTAssertNotNil(response?.data)
+        XCTAssertNil(response?.error)
+    }
+
     func testHiddenHTTPBasicAuthentication() {
         // Given
         let urlString = "\(String.httpBinURLString)/hidden-basic-auth/\(user)/\(password)"

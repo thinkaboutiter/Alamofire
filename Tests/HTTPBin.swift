@@ -25,10 +25,15 @@
 import Alamofire
 import Foundation
 
+extension Int {
+    static let port = 8080
+}
+
 extension String {
+    static let scheme = "http"
     static let httpBinDomain = "127.0.0.1"
-    static let port = ":8080"
-    static let httpBinURLString = "http://\(httpBinDomain)\(port)"
+    static let port = "\(Int.port)"
+    static let httpBinURLString = "\(scheme)://\(httpBinDomain):\(port)"
     static let nonexistentDomain = "https://nonexistent-domain.org"
 }
 
