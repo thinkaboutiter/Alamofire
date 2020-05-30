@@ -20,7 +20,7 @@ jobs:
       - name: Install Firewalk
         run: brew tap jshier/firewalk && brew install firewalk && firewalk &
       - name: macOS (5.1)
-        run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -project "Alamofire.xcodeproj" -scheme "Alamofire macOS" -destination "platform=macOS" clean test | xcpretty
+        run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -project "Alamofire.xcodeproj" -scheme "Alamofire macOS" -destination "platform=macOS" clean test
   macOS_5_2:
     name: Test macOS (5.2)
     runs-on: macOS-latest
@@ -31,7 +31,7 @@ jobs:
       - name: Install Firewalk
         run: brew tap jshier/firewalk && brew install firewalk && firewalk &
       - name: macOS (5.2)
-        run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -project "Alamofire.xcodeproj" -scheme "Alamofire macOS" -destination "platform=macOS" clean test | xcpretty
+        run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -project "Alamofire.xcodeproj" -scheme "Alamofire macOS" -destination "platform=macOS" clean test
   Catalyst:
     name: Test Catalyst 
     runs-on: macOS-latest
@@ -42,7 +42,7 @@ jobs:
       - name: Install Firewalk
         run: brew tap jshier/firewalk && brew install firewalk && firewalk &
       - name: Catalyst
-        run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -project "Alamofire.xcodeproj" -scheme "Alamofire iOS" -destination "platform=macOS" clean test | xcpretty
+        run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -project "Alamofire.xcodeproj" -scheme "Alamofire iOS" -destination "platform=macOS" clean test
   iOS:
     name: Test iOS 
     runs-on: macOS-latest
@@ -56,7 +56,7 @@ jobs:
       - name: Install Firewalk
         run: brew tap jshier/firewalk && brew install firewalk && firewalk &
       - name: iOS - ${{ matrix.destination }}
-        run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -project "Alamofire.xcodeproj" -scheme "Alamofire iOS" -destination "${{ matrix.destination }}" clean test | xcpretty
+        run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -project "Alamofire.xcodeproj" -scheme "Alamofire iOS" -destination "${{ matrix.destination }}" clean test
   tvOS:
     name: Test tvOS 
     runs-on: macOS-latest
@@ -70,7 +70,7 @@ jobs:
       - name: Install Firewalk
         run: brew tap jshier/firewalk && brew install firewalk && firewalk &
       - name: tvOS - ${{ matrix.destination }}
-        run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -project "Alamofire.xcodeproj" -scheme "Alamofire tvOS" -destination "${{ matrix.destination }}" clean test | xcpretty
+        run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -project "Alamofire.xcodeproj" -scheme "Alamofire tvOS" -destination "${{ matrix.destination }}" clean test
   watchOS:
     name: Build watchOS
     runs-on: macOS-latest
