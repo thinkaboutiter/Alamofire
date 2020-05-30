@@ -153,12 +153,12 @@ final class CacheTestCase: BaseTestCase {
 
         // Pause for 1 additional second to ensure all timestamps will be different
         dispatchGroup.enter()
-        serialQueue.asyncAfter(deadline: .now() + 1.1) {
+        serialQueue.asyncAfter(deadline: .now() + 1.5) {
             dispatchGroup.leave()
         }
 
         // Wait for our 1 second pause to complete
-        _ = dispatchGroup.wait(timeout: .now() + 1.5)
+        _ = dispatchGroup.wait(timeout: .now() + 1.75)
     }
 
     // MARK: - Request Helper Methods
