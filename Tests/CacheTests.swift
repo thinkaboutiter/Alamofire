@@ -44,7 +44,7 @@ import XCTest
 /// The different tests below reflect and demonstrate this behavior.
 ///
 /// For information about `Cache-Control` HTTP headers, please refer to RFC 2616 - Section 14.9.
-class CacheTestCase: BaseTestCase {
+final class CacheTestCase: BaseTestCase {
     // MARK: -
 
     struct CacheControl {
@@ -84,9 +84,11 @@ class CacheTestCase: BaseTestCase {
         urlCache = {
             let capacity = 50 * 1024 * 1024 // MBs
             #if targetEnvironment(macCatalyst)
-            return URLCache(memoryCapacity: capacity, diskCapacity: capacity)
+            let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+            return URLCache(memoryCapacity: capacity, diskCapacity: capacity, directory: directory)
             #else
-            return URLCache(memoryCapacity: capacity, diskCapacity: capacity, diskPath: nil)
+            let directory = (NSTemporaryDirectory() as NSString).appendingPathComponent(UUID().uuidString)
+            return URLCache(memoryCapacity: capacity, diskCapacity: capacity, diskPath: directory)
             #endif
         }()
 
@@ -151,12 +153,12 @@ class CacheTestCase: BaseTestCase {
 
         // Pause for 1 additional second to ensure all timestamps will be different
         dispatchGroup.enter()
-        serialQueue.asyncAfter(deadline: .now() + 1) {
+        serialQueue.asyncAfter(deadline: .now() + 1.1) {
             dispatchGroup.leave()
         }
 
         // Wait for our 1 second pause to complete
-        _ = dispatchGroup.wait(timeout: .now() + 1.25)
+        _ = dispatchGroup.wait(timeout: .now() + 1.5)
     }
 
     // MARK: - Request Helper Methods
