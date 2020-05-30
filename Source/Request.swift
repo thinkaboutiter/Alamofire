@@ -1214,7 +1214,7 @@ public final class DataStreamRequest: Request {
                 }
             }
 
-            underlyingQueue.async { state.streams.forEach { stream in stream.queue.async { stream.stream(data) } } }
+            state.streams.forEach { stream in stream.queue.async { stream.stream(data) } }
         }
     }
 
