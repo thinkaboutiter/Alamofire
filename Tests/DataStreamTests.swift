@@ -341,19 +341,20 @@ final class DataStreamTests: BaseTestCase {
 
     func testThatDataStreamCanBeCancelledInClosure() {
         // Given
-        let expectedSize = 1
-        var error: AFError?
+        // Use .main so that completion can't beat cancellation.
+        let session = Session(rootQueue: .main)
+        var completion: DataStreamRequest.Completion?
         let didReceive = expectation(description: "stream should receive")
         let didComplete = expectation(description: "stream should complete")
 
         // When
-        AF.streamRequest(URLRequest.makeHTTPBinRequest(path: "/bytes/\(expectedSize)")).responseStream { stream in
+        session.streamRequest(URLRequest.makeHTTPBinRequest(path: "/bytes/1")).responseStream { stream in
             switch stream.event {
             case .stream:
                 didReceive.fulfill()
                 stream.cancel()
             case .complete:
-                error = stream.completion?.error
+                completion = stream.completion
                 didComplete.fulfill()
             }
         }
@@ -361,19 +362,23 @@ final class DataStreamTests: BaseTestCase {
         wait(for: [didReceive, didComplete], timeout: timeout, enforceOrder: true)
 
         // Then
-        XCTAssertTrue(error?.isExplicitlyCancelledError == true,
-                      "error is not explicitly cancelled but \(error?.localizedDescription ?? "None")")
+        XCTAssertTrue(completion?.error?.isExplicitlyCancelledError == true,
+                      """
+                      error is not explicitly cancelled, instead: \(completion?.error?.localizedDescription ?? "none").
+                      response is: \(completion?.response?.description ?? "none").
+                      """)
     }
 
     func testThatDataStreamCanBeCancelledByToken() {
         // Given
-        let expectedSize = 1
+        // Use .main so that completion can't beat cancellation.
+        let session = Session(rootQueue: .main)
         var completion: DataStreamRequest.Completion?
         let didReceive = expectation(description: "stream should receive")
         let didComplete = expectation(description: "stream should complete")
 
         // When
-        AF.streamRequest(URLRequest.makeHTTPBinRequest(path: "/bytes/\(expectedSize)")).responseStream { stream in
+        session.streamRequest(URLRequest.makeHTTPBinRequest(path: "/bytes/1")).responseStream { stream in
             switch stream.event {
             case .stream:
                 didReceive.fulfill()
