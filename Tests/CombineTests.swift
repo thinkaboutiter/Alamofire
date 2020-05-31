@@ -468,511 +468,511 @@ final class DataRequestCombineTests: CombineTestCase {
 
 // MARK: - DataStreamRequest
 
-//@available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-//final class DataStreamRequestCombineTests: CombineTestCase {
-//    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-//    func testThatDataStreamRequestCanBePublished() {
-//        // Given
-//        let responseReceived = expectation(description: "response should be received")
-//        let completionReceived = expectation(description: "stream should complete")
-//        var result: Result<HTTPBinResponse, AFError>?
-//
-//        // When
-//        store {
-//            AF.streamRequest(URLRequest.makeHTTPBinRequest())
-//                .publishDecodable(type: HTTPBinResponse.self)
-//                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
-//                      receiveValue: { stream in
-//                          switch stream.event {
-//                          case let .stream(value):
-//                              result = value
-//                          case .complete:
-//                              responseReceived.fulfill()
-//                          }
-//                      })
-//        }
-//
-//        waitForExpectations(timeout: timeout)
-//
-//        // Then
-//        XCTAssertNotNil(result?.success)
-//    }
-//
-//    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-//    func testThatNonAutomaticDataStreamRequestCanBePublished() {
-//        // Given
-//        let responseReceived = expectation(description: "response should be received")
-//        let completionReceived = expectation(description: "stream should complete")
-//        let session = Session(startRequestsImmediately: false)
-//        var result: Result<HTTPBinResponse, AFError>?
-//
-//        // When
-//        store {
-//            session.streamRequest(URLRequest.makeHTTPBinRequest())
-//                .publishDecodable(type: HTTPBinResponse.self)
-//                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
-//                      receiveValue: { stream in
-//                          switch stream.event {
-//                          case let .stream(value):
-//                              result = value
-//                          case .complete:
-//                              responseReceived.fulfill()
-//                          }
-//                })
-//        }
-//
-//        waitForExpectations(timeout: timeout)
-//
-//        // Then
-//        XCTAssertNotNil(result?.success)
-//    }
-//
-//    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-//    func testThatDataStreamRequestCanPublishData() {
-//        // Given
-//        let responseReceived = expectation(description: "response should be received")
-//        let completionReceived = expectation(description: "stream should complete")
-//        var result: Result<Data, AFError>?
-//
-//        // When
-//        store {
-//            AF.streamRequest(URLRequest.makeHTTPBinRequest())
-//                .publishData()
-//                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
-//                      receiveValue: { stream in
-//                          switch stream.event {
-//                          case let .stream(value):
-//                              result = value
-//                          case .complete:
-//                              responseReceived.fulfill()
-//                          }
-//                })
-//        }
-//
-//        waitForExpectations(timeout: timeout)
-//
-//        // Then
-//        XCTAssertNotNil(result?.success)
-//    }
-//
-//    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-//    func testThatDataStreamRequestCanPublishString() {
-//        // Given
-//        let responseReceived = expectation(description: "response should be received")
-//        let completionReceived = expectation(description: "stream should complete")
-//        var result: Result<String, AFError>?
-//
-//        // When
-//        store {
-//            AF.streamRequest(URLRequest.makeHTTPBinRequest())
-//                .publishString()
-//                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
-//                      receiveValue: { stream in
-//                          switch stream.event {
-//                          case let .stream(value):
-//                              result = value
-//                          case .complete:
-//                              responseReceived.fulfill()
-//                          }
-//                })
-//        }
-//
-//        waitForExpectations(timeout: timeout)
-//
-//        // Then
-//        XCTAssertNotNil(result?.success)
-//    }
-//
-//    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-//    func testThatDataStreamRequestCanBePublishedWithMultipleHandlers() {
-//        // Given
-//        let handlerResponseReceived = expectation(description: "handler response should be received")
-//        let publishedResponseReceived = expectation(description: "response should be received")
-//        let completionReceived = expectation(description: "stream should complete")
-//        var handlerResult: Result<HTTPBinResponse, AFError>?
-//        var publishedResult: Result<HTTPBinResponse, AFError>?
-//
-//        // When
-//        store {
-//            AF.streamRequest(URLRequest.makeHTTPBinRequest())
-//                .responseStreamDecodable(of: HTTPBinResponse.self) { stream in
-//                    switch stream.event {
-//                    case let .stream(value):
-//                        handlerResult = value
-//                    case .complete:
-//                        handlerResponseReceived.fulfill()
-//                    }
-//                }
-//                .publishDecodable(type: HTTPBinResponse.self)
-//                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
-//                      receiveValue: { stream in
-//                          switch stream.event {
-//                          case let .stream(value):
-//                              publishedResult = value
-//                          case .complete:
-//                              publishedResponseReceived.fulfill()
-//                          }
-//                })
-//        }
-//
-//        waitForExpectations(timeout: timeout)
-//
-//        // Then
-//        XCTAssertNotNil(handlerResult?.success)
-//        XCTAssertNotNil(publishedResult?.success)
-//    }
-//
-//    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-//    func testThatDataStreamRequestCanPublishResult() {
-//        // Given
-//        let responseReceived = expectation(description: "response should be received")
-//        let completionReceived = expectation(description: "stream should complete")
-//        var result: Result<HTTPBinResponse, AFError>?
-//
-//        // When
-//        store {
-//            AF.streamRequest(URLRequest.makeHTTPBinRequest())
-//                .publishDecodable(type: HTTPBinResponse.self)
-//                .result()
-//                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
-//                      receiveValue: { received in
-//                          result = received
-//                          responseReceived.fulfill()
-//                 })
-//        }
-//
-//        waitForExpectations(timeout: timeout)
-//
-//        // Then
-//        XCTAssertNotNil(result?.success)
-//    }
-//
-//    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-//    func testThatDataStreamRequestCanPublishResultWithResponseFailure() {
-//        // Given
-//        let responseReceived = expectation(description: "response should be received")
-//        let completionReceived = expectation(description: "stream should complete")
-//        var result: Result<HTTPBinResponse, AFError>?
-//
-//        // When
-//        store {
-//            AF.streamRequest(URLRequest.makeHTTPBinRequest(path: "delay/1", timeout: 0.1))
-//                .publishDecodable(type: HTTPBinResponse.self)
-//                .result()
-//                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
-//                      receiveValue: { received in
-//                          result = received
-//                          responseReceived.fulfill()
-//                })
-//        }
-//
-//        waitForExpectations(timeout: timeout)
-//
-//        // Then
-//        XCTAssertNil(result?.success)
-//        XCTAssertEqual((result?.failure?.underlyingError as? URLError)?.code, .timedOut)
-//    }
-//
-//    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-//    func testThatDataStreamRequestCanPublishValue() {
-//        // Given
-//        let responseReceived = expectation(description: "response should be received")
-//        let completionReceived = expectation(description: "stream should complete")
-//        var response: HTTPBinResponse?
-//
-//        // When
-//        store {
-//            AF.streamRequest(URLRequest.makeHTTPBinRequest())
-//                .publishDecodable(type: HTTPBinResponse.self)
-//                .value()
-//                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
-//                      receiveValue: { received in
-//                          response = received
-//                          responseReceived.fulfill()
-//                })
-//        }
-//
-//        waitForExpectations(timeout: timeout)
-//
-//        // Then
-//        XCTAssertNotNil(response)
-//    }
-//
-//    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-//    func testThatDataStreamRequestCanPublishValueWithFailure() {
-//        // Given
-//        let completionReceived = expectation(description: "stream should complete")
-//        var error: AFError?
-//
-//        // When
-//        store {
-//            AF.streamRequest(URLRequest.makeHTTPBinRequest(path: "delay/1", timeout: 0.1))
-//                .publishDecodable(type: HTTPBinResponse.self)
-//                .value()
-//                .sink(receiveCompletion: { completion in
-//                    switch completion {
-//                    case let .failure(err):
-//                        error = err
-//                    case .finished:
-//                        error = nil
-//                    }
-//                    completionReceived.fulfill()
-//                }, receiveValue: { _ in })
-//        }
-//
-//        waitForExpectations(timeout: timeout)
-//
-//        // Then
-//        XCTAssertNotNil(error)
-//        XCTAssertEqual((error?.underlyingError as? URLError)?.code, .timedOut)
-//    }
-//
-//    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-//    func testThatPublishedDataStreamRequestIsNotResumedUnlessSubscribed() {
-//        // Given
-//        let responseReceived = expectation(description: "response should be received")
-//        let completionReceived = expectation(description: "stream should complete")
-//        var result: Result<HTTPBinResponse, AFError>?
-//
-//        // When
-//        let request = AF.streamRequest(URLRequest.makeHTTPBinRequest())
-//        let publisher = request.publishDecodable(type: HTTPBinResponse.self)
-//
-//        let stateAfterPublisher = request.state
-//
-//        store {
-//            publisher.sink(receiveCompletion: { _ in completionReceived.fulfill() },
-//                           receiveValue: { stream in
-//                               switch stream.event {
-//                               case let .stream(value):
-//                                   result = value
-//                               case .complete:
-//                                   responseReceived.fulfill()
-//                               }
-//                           })
-//        }
-//
-//        let stateAfterSubscription = request.state
-//
-//        waitForExpectations(timeout: timeout)
-//
-//        // Then
-//        XCTAssertTrue(result?.isSuccess == true)
-//        XCTAssertEqual(stateAfterPublisher, .initialized)
-//        XCTAssertEqual(stateAfterSubscription, .resumed)
-//    }
-//
-//    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-//    func testThatDataStreamRequestCanSubscribedFromNonMainQueueButPublishedOnMainQueue() {
-//        // Given
-//        let responseReceived = expectation(description: "response should be received")
-//        let completionReceived = expectation(description: "stream should complete")
-//        let queue = DispatchQueue(label: "org.alamofire.tests.combineEventQueue")
-//        var receivedOnMain = false
-//        var result: Result<HTTPBinResponse, AFError>?
-//
-//        // When
-//        store {
-//            AF.streamRequest(URLRequest.makeHTTPBinRequest())
-//                .publishDecodable(type: HTTPBinResponse.self)
-//                .subscribe(on: queue)
-//                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
-//                      receiveValue: { stream in
-//                          receivedOnMain = Thread.isMainThread
-//                          switch stream.event {
-//                          case let .stream(value):
-//                              result = value
-//                          case .complete:
-//                              responseReceived.fulfill()
-//                          }
-//                })
-//        }
-//
-//        waitForExpectations(timeout: timeout)
-//
-//        // Then
-//        XCTAssertNotNil(result?.success)
-//        XCTAssertTrue(receivedOnMain)
-//    }
-//
-//    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-//    func testThatDataStreamRequestPublishedOnSeparateQueueIsReceivedOnThatQueue() {
-//        // Given
-//        let responseReceived = expectation(description: "response should be received")
-//        let completionReceived = expectation(description: "stream should complete")
-//        let queue = DispatchQueue(label: "org.alamofire.tests.combineEventQueue")
-//        var result: Result<HTTPBinResponse, AFError>?
-//
-//        // When
-//        store {
-//            AF.streamRequest(URLRequest.makeHTTPBinRequest())
-//                .publishDecodable(type: HTTPBinResponse.self, queue: queue)
-//                .sink(receiveCompletion: { _ in
-//                    dispatchPrecondition(condition: .onQueue(queue))
-//                    completionReceived.fulfill()
-//                },
-//                      receiveValue: { stream in
-//                    dispatchPrecondition(condition: .onQueue(queue))
-//                    switch stream.event {
-//                    case let .stream(value):
-//                        result = value
-//                    case .complete:
-//                        responseReceived.fulfill()
-//                    }
-//                    })
-//        }
-//
-//        waitForExpectations(timeout: timeout)
-//
-//        // Then
-//        XCTAssertNotNil(result?.success)
-//    }
-//
-//    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-//    func testThatDataStreamRequestPublishedOnSeparateQueueCanBeReceivedOntoMainQueue() {
-//        // Given
-//        let responseReceived = expectation(description: "response should be received")
-//        let completionReceived = expectation(description: "stream should complete")
-//        let queue = DispatchQueue(label: "org.alamofire.tests.combineEventQueue")
-//        var receivedOnMain = false
-//        var result: Result<HTTPBinResponse, AFError>?
-//
-//        // When
-//        store {
-//            AF.streamRequest(URLRequest.makeHTTPBinRequest())
-//                .publishDecodable(type: HTTPBinResponse.self, queue: queue)
-//                .receive(on: DispatchQueue.main)
-//                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
-//                      receiveValue: { stream in
-//                          receivedOnMain = Thread.isMainThread
-//                          switch stream.event {
-//                          case let .stream(value):
-//                              result = value
-//                          case .complete:
-//                              responseReceived.fulfill()
-//                          }
-//                })
-//        }
-//
-//        waitForExpectations(timeout: timeout)
-//
-//        // Then
-//        XCTAssertNotNil(result?.success)
-//        XCTAssertTrue(receivedOnMain)
-//    }
-//
-//    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-//    func testThatPublishedDataStreamRequestCanBeCancelledAutomatically() {
-//        // Given
-//        let responseReceived = expectation(description: "response should be received")
-//        let completionReceived = expectation(description: "stream should complete")
-//        var error: AFError?
-//
-//        // When
-//        let request = AF.streamRequest(URLRequest.makeHTTPBinRequest())
-//        var token: AnyCancellable? = request
-//            .publishDecodable(type: HTTPBinResponse.self)
-//            .sink(receiveCompletion: { _ in completionReceived.fulfill() },
-//                  receiveValue: { error = $0.completion?.error; responseReceived.fulfill() })
-//        token = nil
-//
-//        waitForExpectations(timeout: timeout)
-//
-//        // Then
-//        XCTAssertNotNil(error)
-//        XCTAssertTrue(error?.isExplicitlyCancelledError == true,
-//                      "error is not explicitly cancelled but \(error?.localizedDescription ?? "None")")
-//        XCTAssertTrue(request.isCancelled)
-//        XCTAssertNil(token)
-//    }
-//
-//    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-//    func testThatPublishedDataStreamRequestCanBeCancelledManually() {
-//        // Given
-//        let responseReceived = expectation(description: "response should be received")
-//        let completionReceived = expectation(description: "stream should complete")
-//        var error: AFError?
-//
-//        // When
-//        let request = AF.streamRequest(URLRequest.makeHTTPBinRequest())
-//        store {
-//            request
-//                .publishDecodable(type: HTTPBinResponse.self)
-//                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
-//                      receiveValue: { error = $0.completion?.error; responseReceived.fulfill() })
-//        }
-//        request.cancel()
-//
-//        waitForExpectations(timeout: timeout)
-//
-//        // Then
-//        XCTAssertNotNil(error)
-//        XCTAssertTrue(error?.isExplicitlyCancelledError == true,
-//                      "error is not explicitly cancelled but \(error?.localizedDescription ?? "None")")
-//        XCTAssertTrue(request.isCancelled)
-//    }
-//
-//    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-//    func testThatMultipleDataStreamPublishersCanBeCombined() {
-//        // Given
-//        let responseReceived = expectation(description: "combined response should be received")
-//        let completionReceived = expectation(description: "combined stream should complete")
-//        var firstCompletion: DataStreamRequest.Completion?
-//        var secondCompletion: DataStreamRequest.Completion?
-//
-//        // When
-//        let first = AF.streamRequest(URLRequest.makeHTTPBinRequest())
-//            .publishDecodable(type: HTTPBinResponse.self)
-//        let second = AF.streamRequest(URLRequest.makeHTTPBinRequest())
-//            .publishDecodable(type: HTTPBinResponse.self)
-//
-//        store {
-//            Publishers.CombineLatest(first.compactMap { $0.completion }, second.compactMap { $0.completion })
-//                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
-//                      receiveValue: { first, second in
-//                          firstCompletion = first
-//                          secondCompletion = second
-//                          responseReceived.fulfill()
-//                      })
-//        }
-//
-//        waitForExpectations(timeout: timeout)
-//
-//        // Then
-//        XCTAssertNotNil(firstCompletion)
-//        XCTAssertNotNil(secondCompletion)
-//    }
-//
-//    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-//    func testThatMultipleDataStreamRequestPublishersCanBeChained() {
-//        // Given
-//        let responseReceived = expectation(description: "combined response should be received")
-//        let completionReceived = expectation(description: "combined stream should complete")
-//        var firstCompletion: DataStreamRequest.Completion?
-//        var secondCompletion: DataStreamRequest.Completion?
-//
-//        // When
-//        store {
-//            AF.streamRequest(URLRequest.makeHTTPBinRequest())
-//                .publishDecodable(type: HTTPBinResponse.self)
-//                .compactMap { $0.completion }
-//                .flatMap { completion -> DataStreamPublisher<HTTPBinResponse> in
-//                    firstCompletion = completion
-//                    return AF.streamRequest(URLRequest.makeHTTPBinRequest())
-//                        .publishDecodable(type: HTTPBinResponse.self)
-//                }
-//                .compactMap { $0.completion }
-//                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
-//                      receiveValue: { secondCompletion = $0; responseReceived.fulfill() })
-//        }
-//
-//        waitForExpectations(timeout: timeout)
-//
-//        // Then
-//        XCTAssertNotNil(firstCompletion)
-//        XCTAssertNotNil(secondCompletion)
-//    }
-//}
+@available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+final class DataStreamRequestCombineTests: CombineTestCase {
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+    func testThatDataStreamRequestCanBePublished() {
+        // Given
+        let responseReceived = expectation(description: "response should be received")
+        let completionReceived = expectation(description: "stream should complete")
+        var result: Result<HTTPBinResponse, AFError>?
+
+        // When
+        store {
+            AF.streamRequest(URLRequest.makeHTTPBinRequest())
+                .publishDecodable(type: HTTPBinResponse.self)
+                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
+                      receiveValue: { stream in
+                          switch stream.event {
+                          case let .stream(value):
+                              result = value
+                          case .complete:
+                              responseReceived.fulfill()
+                          }
+                      })
+        }
+
+        waitForExpectations(timeout: timeout)
+
+        // Then
+        XCTAssertNotNil(result?.success)
+    }
+
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+    func testThatNonAutomaticDataStreamRequestCanBePublished() {
+        // Given
+        let responseReceived = expectation(description: "response should be received")
+        let completionReceived = expectation(description: "stream should complete")
+        let session = Session(startRequestsImmediately: false)
+        var result: Result<HTTPBinResponse, AFError>?
+
+        // When
+        store {
+            session.streamRequest(URLRequest.makeHTTPBinRequest())
+                .publishDecodable(type: HTTPBinResponse.self)
+                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
+                      receiveValue: { stream in
+                          switch stream.event {
+                          case let .stream(value):
+                              result = value
+                          case .complete:
+                              responseReceived.fulfill()
+                          }
+                })
+        }
+
+        waitForExpectations(timeout: timeout)
+
+        // Then
+        XCTAssertNotNil(result?.success)
+    }
+
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+    func testThatDataStreamRequestCanPublishData() {
+        // Given
+        let responseReceived = expectation(description: "response should be received")
+        let completionReceived = expectation(description: "stream should complete")
+        var result: Result<Data, AFError>?
+
+        // When
+        store {
+            AF.streamRequest(URLRequest.makeHTTPBinRequest())
+                .publishData()
+                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
+                      receiveValue: { stream in
+                          switch stream.event {
+                          case let .stream(value):
+                              result = value
+                          case .complete:
+                              responseReceived.fulfill()
+                          }
+                })
+        }
+
+        waitForExpectations(timeout: timeout)
+
+        // Then
+        XCTAssertNotNil(result?.success)
+    }
+
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+    func testThatDataStreamRequestCanPublishString() {
+        // Given
+        let responseReceived = expectation(description: "response should be received")
+        let completionReceived = expectation(description: "stream should complete")
+        var result: Result<String, AFError>?
+
+        // When
+        store {
+            AF.streamRequest(URLRequest.makeHTTPBinRequest())
+                .publishString()
+                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
+                      receiveValue: { stream in
+                          switch stream.event {
+                          case let .stream(value):
+                              result = value
+                          case .complete:
+                              responseReceived.fulfill()
+                          }
+                })
+        }
+
+        waitForExpectations(timeout: timeout)
+
+        // Then
+        XCTAssertNotNil(result?.success)
+    }
+
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+    func testThatDataStreamRequestCanBePublishedWithMultipleHandlers() {
+        // Given
+        let handlerResponseReceived = expectation(description: "handler response should be received")
+        let publishedResponseReceived = expectation(description: "response should be received")
+        let completionReceived = expectation(description: "stream should complete")
+        var handlerResult: Result<HTTPBinResponse, AFError>?
+        var publishedResult: Result<HTTPBinResponse, AFError>?
+
+        // When
+        store {
+            AF.streamRequest(URLRequest.makeHTTPBinRequest())
+                .responseStreamDecodable(of: HTTPBinResponse.self) { stream in
+                    switch stream.event {
+                    case let .stream(value):
+                        handlerResult = value
+                    case .complete:
+                        handlerResponseReceived.fulfill()
+                    }
+                }
+                .publishDecodable(type: HTTPBinResponse.self)
+                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
+                      receiveValue: { stream in
+                          switch stream.event {
+                          case let .stream(value):
+                              publishedResult = value
+                          case .complete:
+                              publishedResponseReceived.fulfill()
+                          }
+                })
+        }
+
+        waitForExpectations(timeout: timeout)
+
+        // Then
+        XCTAssertNotNil(handlerResult?.success)
+        XCTAssertNotNil(publishedResult?.success)
+    }
+
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+    func testThatDataStreamRequestCanPublishResult() {
+        // Given
+        let responseReceived = expectation(description: "response should be received")
+        let completionReceived = expectation(description: "stream should complete")
+        var result: Result<HTTPBinResponse, AFError>?
+
+        // When
+        store {
+            AF.streamRequest(URLRequest.makeHTTPBinRequest())
+                .publishDecodable(type: HTTPBinResponse.self)
+                .result()
+                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
+                      receiveValue: { received in
+                          result = received
+                          responseReceived.fulfill()
+                 })
+        }
+
+        waitForExpectations(timeout: timeout)
+
+        // Then
+        XCTAssertNotNil(result?.success)
+    }
+
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+    func testThatDataStreamRequestCanPublishResultWithResponseFailure() {
+        // Given
+        let responseReceived = expectation(description: "response should be received")
+        let completionReceived = expectation(description: "stream should complete")
+        var result: Result<HTTPBinResponse, AFError>?
+
+        // When
+        store {
+            AF.streamRequest(URLRequest.makeHTTPBinRequest(path: "delay/1", timeout: 0.1))
+                .publishDecodable(type: HTTPBinResponse.self)
+                .result()
+                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
+                      receiveValue: { received in
+                          result = received
+                          responseReceived.fulfill()
+                })
+        }
+
+        waitForExpectations(timeout: timeout)
+
+        // Then
+        XCTAssertNil(result?.success)
+        XCTAssertEqual((result?.failure?.underlyingError as? URLError)?.code, .timedOut)
+    }
+
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+    func testThatDataStreamRequestCanPublishValue() {
+        // Given
+        let responseReceived = expectation(description: "response should be received")
+        let completionReceived = expectation(description: "stream should complete")
+        var response: HTTPBinResponse?
+
+        // When
+        store {
+            AF.streamRequest(URLRequest.makeHTTPBinRequest())
+                .publishDecodable(type: HTTPBinResponse.self)
+                .value()
+                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
+                      receiveValue: { received in
+                          response = received
+                          responseReceived.fulfill()
+                })
+        }
+
+        waitForExpectations(timeout: timeout)
+
+        // Then
+        XCTAssertNotNil(response)
+    }
+
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+    func testThatDataStreamRequestCanPublishValueWithFailure() {
+        // Given
+        let completionReceived = expectation(description: "stream should complete")
+        var error: AFError?
+
+        // When
+        store {
+            AF.streamRequest(URLRequest.makeHTTPBinRequest(path: "delay/1", timeout: 0.1))
+                .publishDecodable(type: HTTPBinResponse.self)
+                .value()
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case let .failure(err):
+                        error = err
+                    case .finished:
+                        error = nil
+                    }
+                    completionReceived.fulfill()
+                }, receiveValue: { _ in })
+        }
+
+        waitForExpectations(timeout: timeout)
+
+        // Then
+        XCTAssertNotNil(error)
+        XCTAssertEqual((error?.underlyingError as? URLError)?.code, .timedOut)
+    }
+
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+    func testThatPublishedDataStreamRequestIsNotResumedUnlessSubscribed() {
+        // Given
+        let responseReceived = expectation(description: "response should be received")
+        let completionReceived = expectation(description: "stream should complete")
+        var result: Result<HTTPBinResponse, AFError>?
+
+        // When
+        let request = AF.streamRequest(URLRequest.makeHTTPBinRequest())
+        let publisher = request.publishDecodable(type: HTTPBinResponse.self)
+
+        let stateAfterPublisher = request.state
+
+        store {
+            publisher.sink(receiveCompletion: { _ in completionReceived.fulfill() },
+                           receiveValue: { stream in
+                               switch stream.event {
+                               case let .stream(value):
+                                   result = value
+                               case .complete:
+                                   responseReceived.fulfill()
+                               }
+                           })
+        }
+
+        let stateAfterSubscription = request.state
+
+        waitForExpectations(timeout: timeout)
+
+        // Then
+        XCTAssertTrue(result?.isSuccess == true)
+        XCTAssertEqual(stateAfterPublisher, .initialized)
+        XCTAssertEqual(stateAfterSubscription, .resumed)
+    }
+
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+    func testThatDataStreamRequestCanSubscribedFromNonMainQueueButPublishedOnMainQueue() {
+        // Given
+        let responseReceived = expectation(description: "response should be received")
+        let completionReceived = expectation(description: "stream should complete")
+        let queue = DispatchQueue(label: "org.alamofire.tests.combineEventQueue")
+        var receivedOnMain = false
+        var result: Result<HTTPBinResponse, AFError>?
+
+        // When
+        store {
+            AF.streamRequest(URLRequest.makeHTTPBinRequest())
+                .publishDecodable(type: HTTPBinResponse.self)
+                .subscribe(on: queue)
+                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
+                      receiveValue: { stream in
+                          receivedOnMain = Thread.isMainThread
+                          switch stream.event {
+                          case let .stream(value):
+                              result = value
+                          case .complete:
+                              responseReceived.fulfill()
+                          }
+                })
+        }
+
+        waitForExpectations(timeout: timeout)
+
+        // Then
+        XCTAssertNotNil(result?.success)
+        XCTAssertTrue(receivedOnMain)
+    }
+
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+    func testThatDataStreamRequestPublishedOnSeparateQueueIsReceivedOnThatQueue() {
+        // Given
+        let responseReceived = expectation(description: "response should be received")
+        let completionReceived = expectation(description: "stream should complete")
+        let queue = DispatchQueue(label: "org.alamofire.tests.combineEventQueue")
+        var result: Result<HTTPBinResponse, AFError>?
+
+        // When
+        store {
+            AF.streamRequest(URLRequest.makeHTTPBinRequest())
+                .publishDecodable(type: HTTPBinResponse.self, queue: queue)
+                .sink(receiveCompletion: { _ in
+                    dispatchPrecondition(condition: .onQueue(queue))
+                    completionReceived.fulfill()
+                },
+                      receiveValue: { stream in
+                    dispatchPrecondition(condition: .onQueue(queue))
+                    switch stream.event {
+                    case let .stream(value):
+                        result = value
+                    case .complete:
+                        responseReceived.fulfill()
+                    }
+                    })
+        }
+
+        waitForExpectations(timeout: timeout)
+
+        // Then
+        XCTAssertNotNil(result?.success)
+    }
+
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+    func testThatDataStreamRequestPublishedOnSeparateQueueCanBeReceivedOntoMainQueue() {
+        // Given
+        let responseReceived = expectation(description: "response should be received")
+        let completionReceived = expectation(description: "stream should complete")
+        let queue = DispatchQueue(label: "org.alamofire.tests.combineEventQueue")
+        var receivedOnMain = false
+        var result: Result<HTTPBinResponse, AFError>?
+
+        // When
+        store {
+            AF.streamRequest(URLRequest.makeHTTPBinRequest())
+                .publishDecodable(type: HTTPBinResponse.self, queue: queue)
+                .receive(on: DispatchQueue.main)
+                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
+                      receiveValue: { stream in
+                          receivedOnMain = Thread.isMainThread
+                          switch stream.event {
+                          case let .stream(value):
+                              result = value
+                          case .complete:
+                              responseReceived.fulfill()
+                          }
+                })
+        }
+
+        waitForExpectations(timeout: timeout)
+
+        // Then
+        XCTAssertNotNil(result?.success)
+        XCTAssertTrue(receivedOnMain)
+    }
+
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+    func testThatPublishedDataStreamRequestCanBeCancelledAutomatically() {
+        // Given
+        let responseReceived = expectation(description: "response should be received")
+        let completionReceived = expectation(description: "stream should complete")
+        var error: AFError?
+
+        // When
+        let request = AF.streamRequest(URLRequest.makeHTTPBinRequest())
+        var token: AnyCancellable? = request
+            .publishDecodable(type: HTTPBinResponse.self)
+            .sink(receiveCompletion: { _ in completionReceived.fulfill() },
+                  receiveValue: { error = $0.completion?.error; responseReceived.fulfill() })
+        token = nil
+
+        waitForExpectations(timeout: timeout)
+
+        // Then
+        XCTAssertNotNil(error)
+        XCTAssertTrue(error?.isExplicitlyCancelledError == true,
+                      "error is not explicitly cancelled but \(error?.localizedDescription ?? "None")")
+        XCTAssertTrue(request.isCancelled)
+        XCTAssertNil(token)
+    }
+
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+    func testThatPublishedDataStreamRequestCanBeCancelledManually() {
+        // Given
+        let responseReceived = expectation(description: "response should be received")
+        let completionReceived = expectation(description: "stream should complete")
+        var error: AFError?
+
+        // When
+        let request = AF.streamRequest(URLRequest.makeHTTPBinRequest())
+        store {
+            request
+                .publishDecodable(type: HTTPBinResponse.self)
+                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
+                      receiveValue: { error = $0.completion?.error; responseReceived.fulfill() })
+        }
+        request.cancel()
+
+        waitForExpectations(timeout: timeout)
+
+        // Then
+        XCTAssertNotNil(error)
+        XCTAssertTrue(error?.isExplicitlyCancelledError == true,
+                      "error is not explicitly cancelled but \(error?.localizedDescription ?? "None")")
+        XCTAssertTrue(request.isCancelled)
+    }
+
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+    func testThatMultipleDataStreamPublishersCanBeCombined() {
+        // Given
+        let responseReceived = expectation(description: "combined response should be received")
+        let completionReceived = expectation(description: "combined stream should complete")
+        var firstCompletion: DataStreamRequest.Completion?
+        var secondCompletion: DataStreamRequest.Completion?
+
+        // When
+        let first = AF.streamRequest(URLRequest.makeHTTPBinRequest())
+            .publishDecodable(type: HTTPBinResponse.self)
+        let second = AF.streamRequest(URLRequest.makeHTTPBinRequest())
+            .publishDecodable(type: HTTPBinResponse.self)
+
+        store {
+            Publishers.CombineLatest(first.compactMap { $0.completion }, second.compactMap { $0.completion })
+                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
+                      receiveValue: { first, second in
+                          firstCompletion = first
+                          secondCompletion = second
+                          responseReceived.fulfill()
+                      })
+        }
+
+        waitForExpectations(timeout: timeout)
+
+        // Then
+        XCTAssertNotNil(firstCompletion)
+        XCTAssertNotNil(secondCompletion)
+    }
+
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+    func testThatMultipleDataStreamRequestPublishersCanBeChained() {
+        // Given
+        let responseReceived = expectation(description: "combined response should be received")
+        let completionReceived = expectation(description: "combined stream should complete")
+        var firstCompletion: DataStreamRequest.Completion?
+        var secondCompletion: DataStreamRequest.Completion?
+
+        // When
+        store {
+            AF.streamRequest(URLRequest.makeHTTPBinRequest())
+                .publishDecodable(type: HTTPBinResponse.self)
+                .compactMap { $0.completion }
+                .flatMap { completion -> DataStreamPublisher<HTTPBinResponse> in
+                    firstCompletion = completion
+                    return AF.streamRequest(URLRequest.makeHTTPBinRequest())
+                        .publishDecodable(type: HTTPBinResponse.self)
+                }
+                .compactMap { $0.completion }
+                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
+                      receiveValue: { secondCompletion = $0; responseReceived.fulfill() })
+        }
+
+        waitForExpectations(timeout: timeout)
+
+        // Then
+        XCTAssertNotNil(firstCompletion)
+        XCTAssertNotNil(secondCompletion)
+    }
+}
 
 @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
 final class DownloadRequestCombineTests: CombineTestCase {
