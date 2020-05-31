@@ -393,7 +393,6 @@ final class DataStreamTests: BaseTestCase {
                       response is: \(completion?.response?.description ?? "none").
                       """)
     }
-    }
 }
 
 // MARK: - Serialization Tests
