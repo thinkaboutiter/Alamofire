@@ -1149,8 +1149,11 @@ public final class DataStreamRequest: Request {
     struct StreamMutableState {
         /// `OutputStream` bound to the `InputStream` produced by `asInputStream`, if it has been called.
         var outputStream: OutputStream?
-        /// `DispatchQueue`s and stream closures associated called as `Data` is received.
-        var streams: [(queue: DispatchQueue, stream: (_ data: Data) -> Void)] = []
+        /// Stream closures called as `Data` is received.
+        var streams: [(_ data: Data) -> Void] = []
+        /// Number of currently executing streams. Used to ensure completions are only fired after all streams are
+        /// enqueued.
+        var numberOfExecutingStreams = 0
     }
 
     @Protected
@@ -1206,15 +1209,16 @@ public final class DataStreamRequest: Request {
     }
 
     func didReceive(data: Data) {
-        $streamMutableState.read { state in
+        $streamMutableState.write { state in
             if let stream = state.outputStream {
                 underlyingQueue.async {
                     var bytes = Array(data)
                     stream.write(&bytes, maxLength: bytes.count)
                 }
             }
-
-            state.streams.forEach { stream in stream.queue.async { stream.stream(data) } }
+            state.numberOfExecutingStreams += 1
+            let localState = state
+            underlyingQueue.async { localState.streams.forEach { $0(data) } }
         }
     }
 
@@ -1282,17 +1286,30 @@ public final class DataStreamRequest: Request {
         appendResponseSerializer {
             self.underlyingQueue.async {
                 self.responseSerializerDidComplete {
-                    queue.async {
-                        do {
-                            let completion = Completion(request: self.request,
-                                                        response: self.response,
-                                                        metrics: self.metrics,
-                                                        error: self.error)
-                            try stream(.init(event: .complete(completion), token: .init(self)))
-                        } catch {
-                            // Ignore error, as errors on Completion can't be handled anyway.
-                        }
-                    }
+                    self.enqueueCompletion(on: queue, stream: stream)
+                }
+            }
+        }
+    }
+
+    func enqueueCompletion<Success, Failure>(on queue: DispatchQueue,
+                                             stream: @escaping Handler<Success, Failure>) {
+        $streamMutableState.read { state in
+            guard state.numberOfExecutingStreams == 0 else {
+                NSLog("Streams awaiting completing, requeuing.")
+                underlyingQueue.async { self.enqueueCompletion(on: queue, stream: stream) }
+                return
+            }
+
+            queue.async {
+                do {
+                    let completion = Completion(request: self.request,
+                                                response: self.response,
+                                                metrics: self.metrics,
+                                                error: self.error)
+                    try stream(.init(event: .complete(completion), token: .init(self)))
+                } catch {
+                    // Ignore error, as errors on Completion can't be handled anyway.
                 }
             }
         }

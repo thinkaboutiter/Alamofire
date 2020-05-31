@@ -952,14 +952,17 @@ extension DataStreamRequest {
     /// - Returns:  The `DataStreamRequest`.
     @discardableResult
     public func responseStream(on queue: DispatchQueue = .main, stream: @escaping Handler<Data, Never>) -> Self {
-        $streamMutableState.write { state in
-            let capture = (queue, { [unowned self] data in
+        // TODO: Reevaluate self capture.
+        let parser = { [unowned self] (data: Data) in
+            queue.async {
                 self.capturingError {
                     try stream(.init(event: .stream(.success(data)), token: .init(self)))
                 }
-            })
-            state.streams.append(capture)
+                self.$streamMutableState.write { $0.numberOfExecutingStreams -= 1 }
+            }
         }
+
+        $streamMutableState.write { $0.streams.append(parser) }
         appendStreamCompletion(on: queue, stream: stream)
 
         return self
@@ -977,7 +980,9 @@ extension DataStreamRequest {
     public func responseStream<Serializer: DataStreamSerializer>(using serializer: Serializer,
                                                                  on queue: DispatchQueue = .main,
                                                                  stream: @escaping Handler<Serializer.SerializedObject, AFError>) -> Self {
-        let parser = { [unowned self] (data: Data) in
+        let parser = { [weak self] (data: Data) in
+            guard let self = self else { return }
+
             self.serializationQueue.async {
                 // Start work on serialization queue.
                 let result = Result { try serializer.serialize(data) }
@@ -988,16 +993,18 @@ extension DataStreamRequest {
                     if result.isFailure, self.automaticallyCancelOnStreamError {
                         self.cancel()
                     }
+
                     queue.async {
                         self.capturingError {
                             try stream(.init(event: .stream(result), token: .init(self)))
                         }
+                        self.$streamMutableState.write { $0.numberOfExecutingStreams -= 1 }
                     }
                 }
             }
         }
 
-        $streamMutableState.write { $0.streams.append((queue, parser)) }
+        $streamMutableState.write { $0.streams.append(parser) }
         appendStreamCompletion(on: queue, stream: stream)
 
         return self
@@ -1025,12 +1032,13 @@ extension DataStreamRequest {
                         self.capturingError {
                             try stream(.init(event: .stream(.success(string)), token: .init(self)))
                         }
+                        self.$streamMutableState.write { $0.numberOfExecutingStreams -= 1 }
                     }
                 }
             }
         }
 
-        $streamMutableState.write { $0.streams.append((queue, parser)) }
+        $streamMutableState.write { $0.streams.append(parser) }
         appendStreamCompletion(on: queue, stream: stream)
 
         return self

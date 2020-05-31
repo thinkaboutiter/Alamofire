@@ -692,6 +692,49 @@ final class DataStreamIntegrationTests: BaseTestCase {
         XCTAssertNil(decodingError)
     }
 
+    func testThatDataStreamWorksCorrectlyWithMultipleQueues() {
+        // Given
+        let requestQueue = DispatchQueue(label: "org.alamofire.testRequestQueue", attributes: .concurrent)
+        let serializationQueue = DispatchQueue(label: "org.alamofire.testSerializationQueue", attributes: .concurrent)
+        let session = Session(requestQueue: requestQueue, serializationQueue: serializationQueue)
+        var response: HTTPURLResponse?
+        var decodedResponse: HTTPBinResponse?
+        var decodingError: AFError?
+        var streamOnMain = false
+        var completeOnMain = false
+        let didReceive = expectation(description: "stream did receive")
+        let didComplete = expectation(description: "stream complete")
+
+        // When
+        session.streamRequest(URLRequest.makeHTTPBinRequest(path: "stream/1"))
+            .responseStreamDecodable(of: HTTPBinResponse.self) { stream in
+                switch stream.event {
+                case let .stream(result):
+                    streamOnMain = Thread.isMainThread
+                    switch result {
+                    case let .success(value):
+                        decodedResponse = value
+                    case let .failure(error):
+                        decodingError = error
+                    }
+                    didReceive.fulfill()
+                case let .complete(completion):
+                    completeOnMain = Thread.isMainThread
+                    response = completion.response
+                    didComplete.fulfill()
+                }
+            }
+
+        wait(for: [didReceive, didComplete], timeout: timeout, enforceOrder: true)
+
+        // Then
+        XCTAssertTrue(streamOnMain)
+        XCTAssertTrue(completeOnMain)
+        XCTAssertNotNil(decodedResponse)
+        XCTAssertEqual(response?.statusCode, 200)
+        XCTAssertNil(decodingError)
+    }
+
     func testThatDataStreamCanAuthenticate() {
         // Given
         var response: HTTPURLResponse?
