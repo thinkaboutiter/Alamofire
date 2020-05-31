@@ -868,13 +868,13 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
         let urlString = "\(String.httpBinURLString)/get"
         let expectation = self.expectation(description: "request should complete")
         var components: [String]?
-//        var syncComponents: [String]?
+        var syncComponents: [String]?
 
         // When
         let request = session.request(urlString)
         request.cURLDescription {
             components = self.cURLCommandComponents(from: $0)
-//            syncComponents = self.cURLCommandComponents(from: request.cURLDescription())
+            syncComponents = self.cURLCommandComponents(from: request.cURLDescription())
             expectation.fulfill()
         }
 
@@ -884,7 +884,7 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
         XCTAssertEqual(components?[0..<3], ["$", "curl", "-v"])
         XCTAssertTrue(components?.contains("-X") == true)
         XCTAssertEqual(components?.last, "\"\(urlString)\"")
-//        XCTAssertEqual(components?.sorted(), syncComponents?.sorted())
+        XCTAssertEqual(components?.sorted(), syncComponents?.sorted())
     }
 
     func testGETRequestCURLDescriptionCanBeRequestedManyTimes() {
@@ -896,14 +896,6 @@ final class RequestCURLDescriptionTestCase: BaseTestCase {
 
         // When
         let request = session.request(urlString)
-        request.cURLDescription {
-            components = self.cURLCommandComponents(from: $0)
-            request.cURLDescription {
-                secondComponents = self.cURLCommandComponents(from: $0)
-                expectation.fulfill()
-            }
-        }
-        // Trigger the overwrite behavior.
         request.cURLDescription {
             components = self.cURLCommandComponents(from: $0)
             request.cURLDescription {
