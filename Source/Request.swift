@@ -1216,7 +1216,7 @@ public final class DataStreamRequest: Request {
                     stream.write(&bytes, maxLength: bytes.count)
                 }
             }
-            state.numberOfExecutingStreams += 1
+            state.numberOfExecutingStreams += state.streams.count
             let localState = state
             underlyingQueue.async { localState.streams.forEach { $0(data) } }
         }
