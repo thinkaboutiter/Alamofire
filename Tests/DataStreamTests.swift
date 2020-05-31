@@ -368,7 +368,7 @@ final class DataStreamTests: BaseTestCase {
     func testThatDataStreamCanBeCancelledByToken() {
         // Given
         let expectedSize = 1
-        var error: AFError?
+        var completion: DataStreamRequest.Completion?
         let didReceive = expectation(description: "stream should receive")
         let didComplete = expectation(description: "stream should complete")
 
@@ -379,7 +379,7 @@ final class DataStreamTests: BaseTestCase {
                 didReceive.fulfill()
                 stream.token.cancel()
             case .complete:
-                error = stream.completion?.error
+                completion = stream.completion
                 didComplete.fulfill()
             }
         }
@@ -387,8 +387,12 @@ final class DataStreamTests: BaseTestCase {
         wait(for: [didReceive, didComplete], timeout: timeout, enforceOrder: true)
 
         // Then
-        XCTAssertTrue(error?.isExplicitlyCancelledError == true,
-                      "error is not explicitly cancelled but \(error?.localizedDescription ?? "None")")
+        XCTAssertTrue(completion?.error?.isExplicitlyCancelledError == true,
+                      """
+                      error is not explicitly cancelled, instead: \(completion?.error?.localizedDescription ?? "none").
+                      response is: \(completion?.response?.description ?? "none").
+                      """)
+    }
     }
 }
 
