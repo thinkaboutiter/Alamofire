@@ -1128,7 +1128,7 @@ public final class DataStreamRequest: Request {
 
     /// Type used to cancel an ongoing stream.
     public struct CancellationToken {
-        let request: DataStreamRequest
+        weak var request: DataStreamRequest?
 
         init(_ request: DataStreamRequest) {
             self.request = request
@@ -1136,7 +1136,7 @@ public final class DataStreamRequest: Request {
 
         /// Cancel the ongoing stream by canceling the underlying `DataStreamRequest`.
         public func cancel() {
-            request.cancel()
+            request?.cancel()
         }
     }
 

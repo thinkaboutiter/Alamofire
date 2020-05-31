@@ -980,9 +980,7 @@ extension DataStreamRequest {
     public func responseStream<Serializer: DataStreamSerializer>(using serializer: Serializer,
                                                                  on queue: DispatchQueue = .main,
                                                                  stream: @escaping Handler<Serializer.SerializedObject, AFError>) -> Self {
-        let parser = { [weak self] (data: Data) in
-            guard let self = self else { return }
-
+        let parser = { [unowned self] (data: Data) in
             self.serializationQueue.async {
                 // Start work on serialization queue.
                 let result = Result { try serializer.serialize(data) }
