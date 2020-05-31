@@ -1296,7 +1296,6 @@ public final class DataStreamRequest: Request {
                                              stream: @escaping Handler<Success, Failure>) {
         $streamMutableState.read { state in
             guard state.numberOfExecutingStreams == 0 else {
-                NSLog("Streams awaiting completing, requeuing.")
                 underlyingQueue.async { self.enqueueCompletion(on: queue, stream: stream) }
                 return
             }
