@@ -283,7 +283,7 @@ final class DataRequestCombineTests: CombineTestCase {
                           receivedOnMain = Thread.isMainThread
                           response = $0
                           responseReceived.fulfill()
-                })
+                      })
         }
 
         waitForExpectations(timeout: timeout)
@@ -306,14 +306,14 @@ final class DataRequestCombineTests: CombineTestCase {
             AF.request(URLRequest.makeHTTPBinRequest())
                 .publishDecodable(type: HTTPBinResponse.self, queue: queue)
                 .sink(receiveCompletion: { _ in
-                    dispatchPrecondition(condition: .onQueue(queue))
-                    completionReceived.fulfill()
-                },
+                          dispatchPrecondition(condition: .onQueue(queue))
+                          completionReceived.fulfill()
+                      },
                       receiveValue: {
-                    dispatchPrecondition(condition: .onQueue(queue))
-                    response = $0
-                    responseReceived.fulfill()
-                })
+                          dispatchPrecondition(condition: .onQueue(queue))
+                          response = $0
+                          responseReceived.fulfill()
+                      })
         }
 
         waitForExpectations(timeout: timeout)
@@ -341,7 +341,7 @@ final class DataRequestCombineTests: CombineTestCase {
                           receivedOnMain = Thread.isMainThread
                           response = $0
                           responseReceived.fulfill()
-                })
+                      })
         }
 
         waitForExpectations(timeout: timeout)
@@ -352,7 +352,11 @@ final class DataRequestCombineTests: CombineTestCase {
     }
 
     @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-    func testThatPublishedDataRequestCanBeCancelledAutomatically() {
+    func testThatPublishedDataRequestCanBeCancelledAutomatically() throws {
+        if #available(macOS 11, iOS 14, watchOS 7, tvOS 14, *) {
+            throw XCTSkip("Skip on 2020 OS versions, as Combine cancellation no longer emits a value.")
+        }
+
         // Given
         let responseReceived = expectation(description: "response should be received")
         let completionReceived = expectation(description: "stream should complete")
@@ -370,7 +374,8 @@ final class DataRequestCombineTests: CombineTestCase {
 
         // Then
         XCTAssertTrue(response?.result.isFailure == true)
-        XCTAssertTrue(response?.error?.isExplicitlyCancelledError == true)
+        XCTAssertTrue(response?.error?.isExplicitlyCancelledError == true,
+                      "error is not explicitly cancelled but \(response?.error?.localizedDescription ?? "None")")
         XCTAssertTrue(request.isCancelled)
         XCTAssertNil(token)
     }
@@ -396,7 +401,8 @@ final class DataRequestCombineTests: CombineTestCase {
 
         // Then
         XCTAssertTrue(response?.result.isFailure == true)
-        XCTAssertTrue(response?.error?.isExplicitlyCancelledError == true)
+        XCTAssertTrue(response?.error?.isExplicitlyCancelledError == true,
+                      "error is not explicitly cancelled but \(response?.error?.localizedDescription ?? "None")")
         XCTAssertTrue(request.isCancelled)
     }
 
@@ -435,6 +441,7 @@ final class DataRequestCombineTests: CombineTestCase {
         // Given
         let responseReceived = expectation(description: "combined response should be received")
         let completionReceived = expectation(description: "combined stream should complete")
+        let customValue = "CustomValue"
         var firstResponse: DataResponse<HTTPBinResponse, AFError>?
         var secondResponse: DataResponse<HTTPBinResponse, AFError>?
 
@@ -444,7 +451,7 @@ final class DataRequestCombineTests: CombineTestCase {
                 .publishDecodable(type: HTTPBinResponse.self)
                 .flatMap { response -> DataResponsePublisher<HTTPBinResponse> in
                     firstResponse = response
-                    let request = URLRequest.makeHTTPBinRequest(headers: ["X-Custom": response.value?.url ?? "None"])
+                    let request = URLRequest.makeHTTPBinRequest(headers: ["X-Custom": customValue])
                     return AF.request(request)
                         .publishDecodable(type: HTTPBinResponse.self)
                 }
@@ -459,7 +466,7 @@ final class DataRequestCombineTests: CombineTestCase {
         // Then
         XCTAssertTrue(firstResponse?.result.isSuccess == true)
         XCTAssertTrue(secondResponse?.result.isSuccess == true)
-        XCTAssertEqual(secondResponse?.value?.headers["X-Custom"], "https://httpbin.org/get")
+        XCTAssertEqual(secondResponse?.value?.headers["X-Custom"], customValue)
     }
 }
 
@@ -515,7 +522,7 @@ final class DataStreamRequestCombineTests: CombineTestCase {
                           case .complete:
                               responseReceived.fulfill()
                           }
-                })
+                      })
         }
 
         waitForExpectations(timeout: timeout)
@@ -543,7 +550,7 @@ final class DataStreamRequestCombineTests: CombineTestCase {
                           case .complete:
                               responseReceived.fulfill()
                           }
-                })
+                      })
         }
 
         waitForExpectations(timeout: timeout)
@@ -571,7 +578,7 @@ final class DataStreamRequestCombineTests: CombineTestCase {
                           case .complete:
                               responseReceived.fulfill()
                           }
-                })
+                      })
         }
 
         waitForExpectations(timeout: timeout)
@@ -609,7 +616,7 @@ final class DataStreamRequestCombineTests: CombineTestCase {
                           case .complete:
                               publishedResponseReceived.fulfill()
                           }
-                })
+                      })
         }
 
         waitForExpectations(timeout: timeout)
@@ -635,7 +642,7 @@ final class DataStreamRequestCombineTests: CombineTestCase {
                       receiveValue: { received in
                           result = received
                           responseReceived.fulfill()
-                 })
+                      })
         }
 
         waitForExpectations(timeout: timeout)
@@ -660,7 +667,7 @@ final class DataStreamRequestCombineTests: CombineTestCase {
                       receiveValue: { received in
                           result = received
                           responseReceived.fulfill()
-                })
+                      })
         }
 
         waitForExpectations(timeout: timeout)
@@ -686,7 +693,7 @@ final class DataStreamRequestCombineTests: CombineTestCase {
                       receiveValue: { received in
                           response = received
                           responseReceived.fulfill()
-                })
+                      })
         }
 
         waitForExpectations(timeout: timeout)
@@ -782,7 +789,7 @@ final class DataStreamRequestCombineTests: CombineTestCase {
                           case .complete:
                               responseReceived.fulfill()
                           }
-                })
+                      })
         }
 
         waitForExpectations(timeout: timeout)
@@ -805,18 +812,18 @@ final class DataStreamRequestCombineTests: CombineTestCase {
             AF.streamRequest(URLRequest.makeHTTPBinRequest())
                 .publishDecodable(type: HTTPBinResponse.self, queue: queue)
                 .sink(receiveCompletion: { _ in
-                    dispatchPrecondition(condition: .onQueue(queue))
-                    completionReceived.fulfill()
-                },
+                          dispatchPrecondition(condition: .onQueue(queue))
+                          completionReceived.fulfill()
+                      },
                       receiveValue: { stream in
-                    dispatchPrecondition(condition: .onQueue(queue))
-                    switch stream.event {
-                    case let .stream(value):
-                        result = value
-                    case .complete:
-                        responseReceived.fulfill()
-                    }
-                    })
+                          dispatchPrecondition(condition: .onQueue(queue))
+                          switch stream.event {
+                          case let .stream(value):
+                              result = value
+                          case .complete:
+                              responseReceived.fulfill()
+                          }
+                      })
         }
 
         waitForExpectations(timeout: timeout)
@@ -848,7 +855,7 @@ final class DataStreamRequestCombineTests: CombineTestCase {
                           case .complete:
                               responseReceived.fulfill()
                           }
-                })
+                      })
         }
 
         waitForExpectations(timeout: timeout)
@@ -859,7 +866,11 @@ final class DataStreamRequestCombineTests: CombineTestCase {
     }
 
     @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-    func testThatPublishedDataStreamRequestCanBeCancelledAutomatically() {
+    func testThatPublishedDataStreamRequestCanBeCancelledAutomatically() throws {
+        if #available(macOS 11, iOS 14, watchOS 7, tvOS 14, *) {
+            throw XCTSkip("Skip on 2020 OS versions, as Combine cancellation no longer emits a value.")
+        }
+
         // Given
         let responseReceived = expectation(description: "response should be received")
         let completionReceived = expectation(description: "stream should complete")
@@ -877,7 +888,8 @@ final class DataStreamRequestCombineTests: CombineTestCase {
 
         // Then
         XCTAssertNotNil(error)
-        XCTAssertTrue(error?.isExplicitlyCancelledError == true)
+        XCTAssertTrue(error?.isExplicitlyCancelledError == true,
+                      "error is not explicitly cancelled but \(error?.localizedDescription ?? "None")")
         XCTAssertTrue(request.isCancelled)
         XCTAssertNil(token)
     }
@@ -903,7 +915,8 @@ final class DataStreamRequestCombineTests: CombineTestCase {
 
         // Then
         XCTAssertNotNil(error)
-        XCTAssertTrue(error?.isExplicitlyCancelledError == true)
+        XCTAssertTrue(error?.isExplicitlyCancelledError == true,
+                      "error is not explicitly cancelled but \(error?.localizedDescription ?? "None")")
         XCTAssertTrue(request.isCancelled)
     }
 
@@ -953,8 +966,7 @@ final class DataStreamRequestCombineTests: CombineTestCase {
                 .compactMap { $0.completion }
                 .flatMap { completion -> DataStreamPublisher<HTTPBinResponse> in
                     firstCompletion = completion
-                    let request = URLRequest.makeHTTPBinRequest(headers: ["X-Custom": completion.response?.url?.absoluteString ?? "None"])
-                    return AF.streamRequest(request)
+                    return AF.streamRequest(URLRequest.makeHTTPBinRequest())
                         .publishDecodable(type: HTTPBinResponse.self)
                 }
                 .compactMap { $0.completion }
@@ -1068,6 +1080,27 @@ final class DownloadRequestCombineTests: CombineTestCase {
         store {
             AF.download(URLRequest.makeHTTPBinRequest())
                 .publishUnserialized()
+                .sink(receiveCompletion: { _ in completionReceived.fulfill() },
+                      receiveValue: { response = $0; responseReceived.fulfill() })
+        }
+
+        waitForExpectations(timeout: timeout)
+
+        // Then
+        XCTAssertTrue(response?.result.isSuccess == true)
+    }
+
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+    func testThatDownloadRequestCanPublishURL() {
+        // Given
+        let responseReceived = expectation(description: "response should be received")
+        let completionReceived = expectation(description: "publisher should complete")
+        var response: DownloadResponse<URL, AFError>?
+
+        // When
+        store {
+            AF.download(URLRequest.makeHTTPBinRequest())
+                .publishURL()
                 .sink(receiveCompletion: { _ in completionReceived.fulfill() },
                       receiveValue: { response = $0; responseReceived.fulfill() })
         }
@@ -1201,7 +1234,7 @@ final class DownloadRequestCombineTests: CombineTestCase {
                           receivedOnMain = Thread.isMainThread
                           response = $0
                           responseReceived.fulfill()
-                })
+                      })
         }
 
         waitForExpectations(timeout: timeout)
@@ -1224,14 +1257,14 @@ final class DownloadRequestCombineTests: CombineTestCase {
             AF.download(URLRequest.makeHTTPBinRequest())
                 .publishDecodable(type: HTTPBinResponse.self, queue: queue)
                 .sink(receiveCompletion: { _ in
-                    dispatchPrecondition(condition: .onQueue(queue))
-                    completionReceived.fulfill()
-                },
+                          dispatchPrecondition(condition: .onQueue(queue))
+                          completionReceived.fulfill()
+                      },
                       receiveValue: {
-                    dispatchPrecondition(condition: .onQueue(queue))
-                    response = $0
-                    responseReceived.fulfill()
-                })
+                          dispatchPrecondition(condition: .onQueue(queue))
+                          response = $0
+                          responseReceived.fulfill()
+                      })
         }
 
         waitForExpectations(timeout: timeout)
@@ -1259,7 +1292,7 @@ final class DownloadRequestCombineTests: CombineTestCase {
                           receivedOnMain = Thread.isMainThread
                           response = $0
                           responseReceived.fulfill()
-                })
+                      })
         }
 
         waitForExpectations(timeout: timeout)
@@ -1270,7 +1303,11 @@ final class DownloadRequestCombineTests: CombineTestCase {
     }
 
     @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-    func testThatPublishedDownloadRequestCanBeCancelledAutomatically() {
+    func testThatPublishedDownloadRequestCanBeCancelledAutomatically() throws {
+        if #available(macOS 11, iOS 14, watchOS 7, tvOS 14, *) {
+            throw XCTSkip("Skip on 2020 OS versions, as Combine cancellation no longer emits a value.")
+        }
+
         // Given
         let responseReceived = expectation(description: "response should be received")
         let completionReceived = expectation(description: "stream should complete")
@@ -1288,7 +1325,8 @@ final class DownloadRequestCombineTests: CombineTestCase {
 
         // Then
         XCTAssertTrue(response?.result.isFailure == true)
-        XCTAssertTrue(response?.error?.isExplicitlyCancelledError == true)
+        XCTAssertTrue(response?.error?.isExplicitlyCancelledError == true,
+                      "error is not explicitly cancelled but \(response?.error?.localizedDescription ?? "None")")
         XCTAssertTrue(request.isCancelled)
         XCTAssertNil(token)
     }
@@ -1314,7 +1352,8 @@ final class DownloadRequestCombineTests: CombineTestCase {
 
         // Then
         XCTAssertTrue(response?.result.isFailure == true)
-        XCTAssertTrue(response?.error?.isExplicitlyCancelledError == true)
+        XCTAssertTrue(response?.error?.isExplicitlyCancelledError == true,
+                      "error is not explicitly cancelled but \(response?.error?.localizedDescription ?? "None")")
         XCTAssertTrue(request.isCancelled)
     }
 
@@ -1353,6 +1392,7 @@ final class DownloadRequestCombineTests: CombineTestCase {
         // Given
         let responseReceived = expectation(description: "combined response should be received")
         let completionReceived = expectation(description: "combined stream should complete")
+        let customValue = "CustomValue"
         var firstResponse: DownloadResponse<HTTPBinResponse, AFError>?
         var secondResponse: DownloadResponse<HTTPBinResponse, AFError>?
 
@@ -1362,7 +1402,7 @@ final class DownloadRequestCombineTests: CombineTestCase {
                 .publishDecodable(type: HTTPBinResponse.self)
                 .flatMap { response -> DownloadResponsePublisher<HTTPBinResponse> in
                     firstResponse = response
-                    let request = URLRequest.makeHTTPBinRequest(headers: ["X-Custom": response.value?.url ?? "None"])
+                    let request = URLRequest.makeHTTPBinRequest(headers: ["X-Custom": customValue])
                     return AF.download(request)
                         .publishDecodable(type: HTTPBinResponse.self)
                 }
@@ -1377,7 +1417,7 @@ final class DownloadRequestCombineTests: CombineTestCase {
         // Then
         XCTAssertTrue(firstResponse?.result.isSuccess == true)
         XCTAssertTrue(secondResponse?.result.isSuccess == true)
-        XCTAssertEqual(secondResponse?.value?.headers["X-Custom"], "https://httpbin.org/get")
+        XCTAssertEqual(secondResponse?.value?.headers["X-Custom"], customValue)
     }
 }
 

@@ -47,7 +47,7 @@ import XCTest
 class CacheTestCase: BaseTestCase {
     // MARK: -
 
-    struct CacheControl {
+    enum CacheControl {
         static let publicControl = "public"
         static let privateControl = "private"
         static let maxAgeNonExpired = "max-age=3600"
@@ -84,9 +84,11 @@ class CacheTestCase: BaseTestCase {
         urlCache = {
             let capacity = 50 * 1024 * 1024 // MBs
             #if targetEnvironment(macCatalyst)
-            return URLCache(memoryCapacity: capacity, diskCapacity: capacity)
+            let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+            return URLCache(memoryCapacity: capacity, diskCapacity: capacity, directory: directory)
             #else
-            return URLCache(memoryCapacity: capacity, diskCapacity: capacity, diskPath: nil)
+            let directory = (NSTemporaryDirectory() as NSString).appendingPathComponent(UUID().uuidString)
+            return URLCache(memoryCapacity: capacity, diskCapacity: capacity, diskPath: directory)
             #endif
         }()
 
@@ -141,7 +143,7 @@ class CacheTestCase: BaseTestCase {
                                            self.timestamps[cacheControl] = timestamp
 
                                            dispatchGroup.leave()
-            })
+                                       })
 
             requests[cacheControl] = request
         }
@@ -187,7 +189,7 @@ class CacheTestCase: BaseTestCase {
         request.response(queue: queue,
                          completionHandler: { response in
                              completion(response.request, response.response)
-        })
+                         })
 
         return urlRequest
     }
